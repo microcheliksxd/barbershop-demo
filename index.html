@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Барбершоп «Бородач»: стрижки и борода</title>
+<meta name="description" content="Мужские стрижки, уход за бородой, опасное бритьё. Прайс, часы работы и запись.">
+
+<!--
+  ДЕМО-САЙТ. Компания вымышленная.
+  Что заменить под реального клиента:
+    1. Название «Бородач» (искать по тексту)
+    2. Телефон: +7 (900) 000-00-00  и  tel:+79000000000
+    3. Telegram: https://t.me/your_username
+    4. Адрес: ул. Школьная, 12
+    5. Цены и услуги: блок <section id="prices">
+    6. Часы работы: блок #hours и массив HOURS в скрипте внизу
+-->
+
+<style>
+  :root{
+    --navy:  #14284B;
+    --red:   #C8302F;
+    --blue:  #2F5DA8;
+    --bg:    #F4F6F9;
+    --card:  #FFFFFF;
+    --ink:   #1B2233;
+    --muted: #59627A;
+    --line:  #D5DAE5;
+
+    --serif: Georgia, "Times New Roman", serif;
+    --sans:  system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  }
+
+  *{ box-sizing:border-box; }
+  html{ scroll-behavior:smooth; }
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:var(--sans); font-size:17px; line-height:1.55;
+  }
+  img,svg{ max-width:100%; }
+  a{ color:inherit; }
+  :focus-visible{ outline:3px solid var(--blue); outline-offset:3px; border-radius:4px; }
+
+  .wrap{ width:min(1040px, 100% - 40px); margin-inline:auto; }
+
+  h1,h2{ font-family:var(--serif); color:var(--navy); line-height:1.1; margin:0; }
+  h1{ font-size:clamp(38px, 7vw, 68px); font-weight:700; letter-spacing:-0.01em; }
+  h2{ font-size:clamp(28px, 4vw, 38px); font-weight:700; margin-bottom:20px; }
+  p{ margin:0 0 14px; }
+
+  /* ---------- Кнопки ---------- */
+  .btn{
+    display:inline-block; padding:14px 22px; border-radius:10px;
+    font-weight:600; text-decoration:none; border:2px solid var(--navy);
+    background:var(--navy); color:#fff; cursor:pointer; font-size:17px; font-family:inherit;
+    transition:background .15s, color .15s;
+  }
+  .btn:hover{ background:#0d1c38; }
+  .btn.ghost{ background:transparent; color:var(--navy); }
+  .btn.ghost:hover{ background:var(--navy); color:#fff; }
+
+  /* ---------- Шапка ---------- */
+  header.top{ padding:18px 0; border-bottom:1px solid var(--line); background:var(--card); }
+  header.top .wrap{ display:flex; align-items:center; justify-content:space-between; gap:16px; }
+  .logo{ font-family:var(--serif); font-weight:700; font-size:22px; color:var(--navy); text-decoration:none; }
+  nav{ display:flex; gap:22px; }
+  nav a{ text-decoration:none; color:var(--muted); font-weight:500; }
+  nav a:hover{ color:var(--navy); }
+
+  /* ---------- Главный экран ---------- */
+  .hero{ padding:56px 0 64px; }
+  .hero .wrap{ display:grid; grid-template-columns:1fr 110px; gap:48px; align-items:stretch; }
+  .hero-text{ max-width:600px; }
+  .hero-text p.lead{ font-size:20px; color:var(--muted); margin:22px 0 28px; max-width:34em; }
+  .hero-actions{ display:flex; flex-wrap:wrap; gap:12px; }
+
+  .status{
+    display:inline-flex; align-items:center; gap:10px; margin-top:28px;
+    font-weight:500; color:var(--ink);
+  }
+  .dot{ width:12px; height:12px; border-radius:50%; background:var(--muted); flex:none; }
+  .status.open .dot{ background:#2E8B57; }
+  .status.closed .dot{ background:var(--red); }
+
+  /* Вывеска-барберпол: главный акцент страницы */
+  .pole-wrap{
+    position:relative; min-height:380px; border-radius:55px;
+    border:4px solid var(--navy); background:#fff; overflow:hidden;
+  }
+  .pole{
+    position:absolute; inset: -150px;
+    background:repeating-linear-gradient(
+      45deg,
+      var(--red) 0 20px, #fff 20px 40px,
+      var(--blue) 40px 60px, #fff 60px 80px
+    );
+    animation:spin 6s linear infinite;
+  }
+  @keyframes spin{ to{ transform:translateY(113.137px); } }
+
+  /* ---------- Секции ---------- */
+  section{ padding:56px 0; }
+  section.alt{ background:var(--card); border-block:1px solid var(--line); }
+  .section-note{ color:var(--muted); max-width:36em; margin-bottom:28px; }
+
+  /* ---------- Прайс ---------- */
+  .price-list{ border:0; padding:0; margin:0; }
+  .row{
+    display:grid; grid-template-columns:28px 1fr auto 90px; gap:16px; align-items:center;
+    padding:16px 0; border-bottom:1px solid var(--line); cursor:pointer;
+  }
+  .row:first-of-type{ border-top:1px solid var(--line); }
+  .row input{ width:22px; height:22px; accent-color:var(--navy); cursor:pointer; }
+  .row .name{ font-weight:600; }
+  .row .name small{ display:block; font-weight:400; color:var(--muted); font-size:15px; }
+  .row .min{ color:var(--muted); font-size:15px; white-space:nowrap; }
+  .row .price{ text-align:right; font-weight:700; font-variant-numeric:tabular-nums; white-space:nowrap; }
+  .row:hover .name{ color:var(--blue); }
+
+  .total{
+    margin-top:24px; padding:22px 24px; border-radius:14px;
+    background:var(--navy); color:#fff;
+    display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:16px;
+  }
+  .total .sum{ font-family:var(--serif); font-size:34px; font-weight:700; line-height:1; }
+  .total .time{ color:#C5CFE6; margin-top:6px; }
+  .total .btn{ background:#fff; color:var(--navy); border-color:#fff; }
+  .total .btn:hover{ background:#E4E9F4; }
+
+  /* ---------- Контакты ---------- */
+  .contact-grid{ display:grid; grid-template-columns:1fr 1fr; gap:40px; }
+  .contact-grid h3{ font-family:var(--serif); font-size:22px; color:var(--navy); margin:0 0 10px; }
+  .hours{ width:100%; border-collapse:collapse; }
+  .hours td{ padding:8px 0; border-bottom:1px solid var(--line); }
+  .hours td:last-child{ text-align:right; font-variant-numeric:tabular-nums; }
+  .hours tr.today td{ font-weight:700; color:var(--navy); }
+  .contact-buttons{ display:flex; flex-direction:column; gap:12px; align-items:flex-start; margin-top:18px; }
+
+  footer{ padding:28px 0 40px; color:var(--muted); font-size:15px; }
+  footer .demo{
+    display:inline-block; padding:6px 12px; border-radius:8px;
+    background:#E4E9F4; color:var(--navy); margin-bottom:10px;
+  }
+
+  /* ---------- Телефоны ---------- */
+  @media (max-width:760px){
+    body{ font-size:16px; }
+    nav{ display:none; }
+    .hero{ padding:36px 0 48px; }
+    .hero .wrap{ grid-template-columns:1fr; gap:32px; }
+    .pole-wrap{ order:-1; min-height:0; height:38px; border-radius:19px; border-width:3px; }
+    .pole{ animation-name:spin-h; }
+    @keyframes spin-h{ to{ background-position:113.137px 0; } }
+    .row{ grid-template-columns:28px 1fr 80px; row-gap:0; }
+    .row .min{ display:none; }
+    .contact-grid{ grid-template-columns:1fr; gap:32px; }
+  }
+
+  @media (prefers-reduced-motion:reduce){
+    .pole{ animation:none; }
+    html{ scroll-behavior:auto; }
+  }
+</style>
+</head>
+
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <a class="logo" href="#top">Бородач</a>
+    <nav aria-label="Разделы сайта">
+      <a href="#prices">Цены</a>
+      <a href="#contacts">Контакты</a>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+
+  <div class="hero">
+    <div class="wrap">
+      <div class="hero-text">
+        <h1>Барбершоп «Бородач»: стрижка за 45 минут</h1>
+        <p class="lead">Мужские и детские стрижки, борода, опасное бритьё. Без очередей: записывайтесь заранее, или приходите, если есть свободное время.</p>
+        <div class="hero-actions">
+          <a class="btn" href="#prices">Выбрать услуги</a>
+          <a class="btn ghost" href="tel:+79000000000">Позвонить</a>
+        </div>
+        <div class="status" id="status" aria-live="polite">
+          <span class="dot"></span><span id="status-text">Проверяем часы работы…</span>
+        </div>
+      </div>
+
+      <div class="pole-wrap" aria-hidden="true">
+        <div class="pole"></div>
+      </div>
+    </div>
+  </div>
+
+  <section id="prices" class="alt">
+    <div class="wrap">
+      <h2>Цены</h2>
+      <p class="section-note">Отметьте, что хотите сделать: внизу посчитаем стоимость и время визита.</p>
+
+      <fieldset class="price-list" id="price-list">
+        <legend class="visually-hidden" style="position:absolute;left:-9999px;">Список услуг</legend>
+
+        <label class="row">
+          <input type="checkbox" data-price="800" data-min="45">
+          <span class="name">Мужская стрижка<small>ножницы и машинка, мытьё головы, укладка</small></span>
+          <span class="min">45 мин</span>
+          <span class="price">800 ₽</span>
+        </label>
+
+        <label class="row">
+          <input type="checkbox" data-price="500" data-min="30">
+          <span class="name">Стрижка машинкой<small>под одну насадку или с переходом</small></span>
+          <span class="min">30 мин</span>
+          <span class="price">500 ₽</span>
+        </label>
+
+        <label class="row">
+          <input type="checkbox" data-price="500" data-min="30">
+          <span class="name">Борода<small>форма, контур, уход маслом</small></span>
+          <span class="min">30 мин</span>
+          <span class="price">500 ₽</span>
+        </label>
+
+        <label class="row">
+          <input type="checkbox" data-price="700" data-min="30">
+          <span class="name">Опасное бритьё<small>горячее полотенце, бритьё лезвием</small></span>
+          <span class="min">30 мин</span>
+          <span class="price">700 ₽</span>
+        </label>
+
+        <label class="row">
+          <input type="checkbox" data-price="600" data-min="30">
+          <span class="name">Детская стрижка<small>до 12 лет</small></span>
+          <span class="min">30 мин</span>
+          <span class="price">600 ₽</span>
+        </label>
+
+        <label class="row">
+          <input type="checkbox" data-price="300" data-min="15">
+          <span class="name">Оформление висков и шеи<small>отдельно, если стрижка не нужна</small></span>
+          <span class="min">15 мин</span>
+          <span class="price">300 ₽</span>
+        </label>
+      </fieldset>
+
+      <div class="total" aria-live="polite">
+        <div>
+          <div class="sum" id="sum">0 ₽</div>
+          <div class="time" id="time">Ничего не выбрано</div>
+        </div>
+        <a class="btn" href="#contacts">Записаться</a>
+      </div>
+    </div>
+  </section>
+
+  <section id="contacts">
+    <div class="wrap contact-grid">
+      <div>
+        <h2>Как записаться</h2>
+        <p>Позвоните или напишите в мессенджер: назовите услуги и удобное время. Ответим в рабочие часы.</p>
+        <div class="contact-buttons">
+          <a class="btn" href="tel:+79000000000">+7 (900) 000-00-00</a>
+          <a class="btn ghost" href="https://t.me/your_username" target="_blank" rel="noopener">Написать в Telegram</a>
+        </div>
+
+        <h3 style="margin-top:32px;">Адрес</h3>
+        <p>ул. Примерная, 1, вход со двора, вывеска над дверью.</p>
+        <p style="color: var(--muted); font-size: 15px;">Адрес вымышленный: это демонстрационный сайт</p>
+      </div>
+
+      <div id="hours">
+        <h3>Часы работы</h3>
+        <table class="hours">
+          <tbody>
+            <tr data-day="1"><td>Понедельник</td><td>10:00–20:00</td></tr>
+            <tr data-day="2"><td>Вторник</td><td>10:00–20:00</td></tr>
+            <tr data-day="3"><td>Среда</td><td>10:00–20:00</td></tr>
+            <tr data-day="4"><td>Четверг</td><td>10:00–20:00</td></tr>
+            <tr data-day="5"><td>Пятница</td><td>10:00–20:00</td></tr>
+            <tr data-day="6"><td>Суббота</td><td>10:00–18:00</td></tr>
+            <tr data-day="0"><td>Воскресенье</td><td>10:00–18:00</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="demo">Демо-сайт: компания вымышленная</div>
+    <div>© Барбершоп «Бородач»</div>
+  </div>
+</footer>
+
+<script>
+  // ---------- Подсчёт стоимости и времени ----------
+  (function () {
+    var list  = document.getElementById('price-list');
+    var sumEl = document.getElementById('sum');
+    var timeEl = document.getElementById('time');
+
+    function fmt(n){ return n.toLocaleString('ru-RU') + ' ₽'; }
+
+    function minutesText(m){
+      var h = Math.floor(m / 60), r = m % 60;
+      if (h === 0) return r + ' мин';
+      if (r === 0) return h + ' ч';
+      return h + ' ч ' + r + ' мин';
+    }
+
+    function update(){
+      var boxes = list.querySelectorAll('input[type="checkbox"]:checked');
+      var price = 0, mins = 0;
+      boxes.forEach(function (b) {
+        price += Number(b.dataset.price);
+        mins  += Number(b.dataset.min);
+      });
+      sumEl.textContent = fmt(price);
+      timeEl.textContent = boxes.length
+        ? 'Примерно ' + minutesText(mins)
+        : 'Ничего не выбрано';
+    }
+
+    list.addEventListener('change', update);
+    update();
+  })();
+
+  // ---------- «Сейчас открыто / закрыто» ----------
+  (function () {
+    // 0 = воскресенье ... 6 = суббота; часы открытия и закрытия
+    var HOURS = {
+      0: [10, 18], 1: [10, 20], 2: [10, 20], 3: [10, 20],
+      4: [10, 20], 5: [10, 20], 6: [10, 18]
+    };
+
+    var now = new Date();
+    var day = now.getDay();
+    var hour = now.getHours() + now.getMinutes() / 60;
+    var box = document.getElementById('status');
+    var text = document.getElementById('status-text');
+
+    var row = document.querySelector('#hours tr[data-day="' + day + '"]');
+    if (row) row.classList.add('today');
+
+    var today = HOURS[day];
+    if (hour >= today[0] && hour < today[1]) {
+      box.className = 'status open';
+      text.textContent = 'Сейчас открыто, работаем до ' + today[1] + ':00';
+    } else {
+      box.className = 'status closed';
+      var nextDay = hour < today[0] ? day : (day + 1) % 7;
+      var when = hour < today[0] ? 'сегодня' : 'завтра';
+      text.textContent = 'Сейчас закрыто, откроемся ' + when + ' в ' + HOURS[nextDay][0] + ':00';
+    }
+  })();
+</script>
+
+</body>
+</html>
